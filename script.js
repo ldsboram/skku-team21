@@ -216,3 +216,15 @@ while(true){
     
 }
 console.log(turns+" turns passed to finish the game.");
+
+export{
+    Peg,
+    Player,
+    whereToGo,
+    throwDice,
+    isPeg,
+    isAllInHome,
+    isAllInGoal,
+    whatToMove,
+    moveToThere,
+}
