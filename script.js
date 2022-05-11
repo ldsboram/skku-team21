@@ -10,10 +10,13 @@ class Player{
     constructor(name, playerNo){
         this.name=name;
         this.playerNo=playerNo;
-        for(let i=0; i<4; i++){
-            this.peg[i]=new Peg(playerNo, i);
-        }
+        this.peg= [];
     }//Player(플레이어) 클래스입니다. 이름, 플레이어 번호(0~3), 말을 초기화합니다.
+    set(){
+        for(let i=0; i<4; i++){
+            this.peg[i]=new Peg(this.playerNo, i);
+        }
+    }
 }
 
 function whereToGo(playerNo, now, advance){//playerNo: 플레이어의 번호(0,1,2,3) now: 말판 위 현재 위치 advance: 전진할 칸의 수(0~6)
@@ -22,7 +25,7 @@ function whereToGo(playerNo, now, advance){//playerNo: 플레이어의 번호(0,
     }
 
     if(now>=200 && advance===6){//집에 있는 경우 시작 지점으로 이동
-        return ((now-200)/10)*10;
+        return playerNo*10;
     }
     else if(now>=200){//6이 나왔을 때만.
         return -1;
@@ -68,7 +71,7 @@ function isPeg(position,players){//특정 포지션에 어떤 말이 있는지 �
             }
         }
     }
-    return Peg(-1,-1);
+    return new Peg(-1,-1);
 }
 
 function isAllInHome(me, players){//전부 집에 있을 시 true
@@ -81,6 +84,16 @@ function isAllInHome(me, players){//전부 집에 있을 시 true
     return allInHome;
 }
 
+function isAllInGoal(me, players){//전부 목적지에 있을 시 true
+    let allInGoal=true;
+    for(let i=0; i<4; i++){
+        if(!(players[me].peg[i].position>=100 && players[me].peg[i].position<=133)){
+            allInGoal=false;
+        }
+    }
+    return allInGoal;
+}
+
 function whatToMove(me, dice, players){//주어진 환경에서 주사위 수가 주어졌을 때 움직일 peg 숫자 반환
     let number=[0,1,2,3];
     shuffle(number);//peg 우선순위를 섞어서 고려합니다
@@ -89,10 +102,25 @@ function whatToMove(me, dice, players){//주어진 환경에서 주사위 수가
         return 0;
     }
 
+    for(let I=0; I<4; I++){//다른 말을 잡을 수 있는 내 말이 존재하는지를 먼저 검토합니다.
+        let i=number[I];
+
+        let dest=whereToGo(me,players[me].peg[i].position,dice);
+        if(dest===-1){//해당 말이 움직일 수 없다면 무시
+            continue;
+        }
+        if(isPeg(dest,players).ownerNo!=me && isPeg(dest,players).ownerNo!=-1){//전진할 곳에 잡을 수 있는 말이 있다면 그 말을 우선적으로 선택하여 반환
+            return i;
+        }
+    }
+
     for(let I=0; I<4; I++){//0부터 3까지 무작위로 고려하되 
         let i=number[I];
 
         let dest=whereToGo(me,players[me].peg[i].position,dice);
+        if(dest===-1){//해당 말이 움직일 수 없다면 무시
+            continue;
+        }
         if(isPeg(dest,players).ownerNo!=me){//전진할 곳에 내 말이 있지 않으면 그 말을 선택하여 반환
             return i;
         }
@@ -106,12 +134,85 @@ function moveToThere(me,pegNo,dest,players){//내 말을 전진시키고 필요�
     
     if(catched.ownerNo===-1){//전진할 곳이 비어 있다면 내 말을 그 곳으로 교체
         players[me].peg[pegNo].position=dest;
+        return -1;
     }
     else if(catched.ownerNo!=me){//전진할 곳에 어떤 말이 있다면 내 말을 그 곳에 두고 그 말을 제자리로 돌려보냄
+        let catchedPlayer=catched.ownerNo;
+
         players[me].peg[pegNo].position=dest;
         catched.position=200+catched.ownerNo*10+catched.pegNo;
+        return catchedPlayer;
     }
 }
 
-let players = new Player[4];
-//게임 진행 코드 삽입 예정
+function wait(sec){
+    let start=Date.now(), now=start;
+    while(now-start<sec*1000){
+        now=Date.now();
+    }
+}
+
+let players = [];
+for(let i=0; i<4; i++){
+    players[i]= new Player("AI"+i,i);
+    players[i].set();
+}// 플레이어 생성
+
+let turns=0;
+//게임 진행 코드
+let nowPlayer=0;//0번 플레이어부터 시작
+while(true){
+    console.log("\nPlayer no."+nowPlayer+" takes the turn!");
+    turns++;
+
+    let dice=1;
+    if(!isAllInHome(nowPlayer,players)){//말이 전부 집에 있지 않으면
+        dice=throwDice();//주사위를 던짐
+        console.log("Player no."+nowPlayer+" rolled the dice and the result is "+dice+"!");
+    }
+    let movingPeg=whatToMove(nowPlayer,dice,players);//움직일 말을 고르기
+
+    if(movingPeg!=-1){//움직일 말이 있다면
+        let advance=dice;
+        if(isAllInHome(nowPlayer,players)){//내 말이 다 집에 있으면 전진량은 6인 셈 침.(집에서 나가기 위해)
+            advance=6;
+        }
+        let dest=whereToGo(nowPlayer,players[nowPlayer].peg[movingPeg].position,advance);//그 말이 갈 곳을 계산 후
+        console.log("Player no."+nowPlayer+" moved his peg no."+movingPeg+" which is in square no. "+players[nowPlayer].peg[movingPeg].position+",");
+        let catchedPlayer=moveToThere(nowPlayer,movingPeg,dest,players);//그 칸으로 움직임
+        console.log(" to square no. "+dest+"!");
+
+        if(catchedPlayer!=-1){
+            console.log("Player no."+catchedPlayer+" loses a Peg!");
+        }
+    }
+    else{//없으면 패스
+        console.log("Nothing to move! PASS!");
+    }
+
+    console.log("\nState of board:")//디버그용 보드 체커
+    for(let i=0; i<4; i++){
+        let str="Player no."+i+" || ";
+        for(let j=0; j<4; j++){
+            str+="Peg "+j+": "+players[i].peg[j].position+" | ";
+        }
+        console.log(str);
+    }
+
+    if(isAllInGoal(nowPlayer,players)){//승리 체크
+        console.log("Player no."+nowPlayer+" WIN!!");
+        break;
+    }
+
+    if(dice!=6){//주사위 숫자가 6이 아니라면
+        console.log("Player no."+nowPlayer+" finishes the turn!");
+        nowPlayer=(nowPlayer+1)%4;//턴 넘김
+    }
+    else{//주사위 숫자가 6이라면 한번 더 할 수 있음.
+        console.log("Player no."+nowPlayer+" can roll the dice again!");
+    }
+
+    //wait(8);//디버깅용, 8초 대기
+    
+}
+console.log(turns+" turns passed to finish the game.");
