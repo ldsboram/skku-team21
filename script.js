@@ -161,7 +161,10 @@ for(let i=0; i<4; i++){
 let turns=0;
 //게임 진행 코드
 let nowPlayer=0;//0번 플레이어부터 시작
-while(true){
+
+let previousPositions = [];
+
+function nextTurn() {
     console.log("\nPlayer no."+nowPlayer+" takes the turn!");
     turns++;
 
@@ -201,7 +204,7 @@ while(true){
 
     if(isAllInGoal(nowPlayer,players)){//승리 체크
         console.log("Player no."+nowPlayer+" WIN!!");
-        break;
+        return;
     }
 
     if(dice!=6){//주사위 숫자가 6이 아니라면
@@ -212,19 +215,24 @@ while(true){
         console.log("Player no."+nowPlayer+" can roll the dice again!");
     }
 
-    //wait(8);//디버깅용, 8초 대기
-    
-}
-console.log(turns+" turns passed to finish the game.");
+    while(previousPositions.length) {
+        const position = previousPositions.pop();
 
-export{
-    Peg,
-    Player,
-    whereToGo,
-    throwDice,
-    isPeg,
-    isAllInHome,
-    isAllInGoal,
-    whatToMove,
-    moveToThere,
+        document.getElementById(`pixel-${position}`).innerText = "";
+    }
+
+    const emojis = ["💙","❤️‍🔥","💛","💚"]
+    players.forEach((player, i) => {
+        const pegs = player.peg;
+
+        pegs.forEach((peg) => {
+            const target = document.getElementById(`pixel-${peg.position}`);
+
+            if(peg.position !== 0 && target) {
+                previousPositions.push(peg.position);
+
+                target.innerText = emojis[i];
+            }
+        })
+    })
 }
