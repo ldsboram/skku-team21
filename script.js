@@ -337,7 +337,7 @@ let winFlag = false;
 let selectableDest = [];
 
 let previousPositions = [];
-declareOfWin();
+
 updateInterface();
 
 function Turn() {
