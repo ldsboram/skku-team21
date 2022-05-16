@@ -1,0 +1,107 @@
+.container {
+    width: 640px;
+}
+
+.row {
+    display: flex;
+    justify-content: center;
+}
+
+.pixel {
+    background: #dddddd;
+    opacity: .6;
+    width: 40px;
+    height: 40px;
+    border-radius: 3px;
+    margin: 2px;
+    border: .1px solid black;
+    text-align: center;
+    padding: 5px
+}
+
+.pixel:hover {
+    opacity: 1;
+}
+
+.pixel.red {
+    background: red;
+}
+
+.pixel.yellow {
+    background: yellow;
+}
+
+.pixel.green {
+    background: green;
+}
+
+.pixel.blue {
+    background: blue;
+}
+
+.pixel.black {
+    background: #111;
+}
+
+.pixel.select {
+    border: 5px solid blueviolet;
+}
+
+.pixel.moveable {
+    border: 5px solid orange;
+}
+
+.pixel.here {
+    border: 5px solid magenta;
+}
+
+.wrap {
+    padding: 10px;
+}
+
+.btn_open {
+    font-weight: bold;
+    margin: 5px;
+    padding: 4px 6px;
+    background: #000;
+    color: #fff;
+}
+
+.pop_wrap {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, .5);
+    font-size: 0;
+    text-align: center;
+}
+
+.pop_wrap:after {
+    display: inline-block;
+    height: 100%;
+    vertical-align: middle;
+    content: '';
+}
+
+.link-icon {
+    position: relative;
+    display: inline-block;
+    width: auto;
+    font-size: 14px;
+    font-weight: 500;
+    color: #333;
+    margin-right: 10px;
+    padding-top: 50px;
+}
+
+.pop_wrap .pop_inner {
+    display: inline-block;
+    padding: 20px 30px;
+    background: #fff;
+    width: 300px;
+    height: 200px;
+    vertical-align: middle;
+    font-size: 15px;
+}
