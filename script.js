@@ -487,7 +487,12 @@ btnPopClose.addEventListener('click', function () {
 
 function declareOfWin() {// 승리 시 선언되는 함수
     updateInterface();
-    document.getElementById(`dsc`).innerText = "Player "+nowPlayer + " Wins!!";
+    if(nowPlayer===0){
+        document.getElementById(`dsc`).innerText ="YOU WIN!!";
+    }
+    else{
+        document.getElementById(`dsc`).innerText = "Player "+nowPlayer + " Wins!!";
+    }
     document.querySelector('#popup').style.display = 'block';
 }
 
