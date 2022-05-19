@@ -339,7 +339,7 @@ let selectableDest = [];
 let previousPositions = [];
 
 updateInterface();
-declareOfWin();
+//declareOfWin();
 function Turn() {
     console.log("\nPlayer no." + nowPlayer + " takes the turn!");
     changePlayer(nowPlayer);//상태창 변경
