@@ -466,12 +466,14 @@ function otherTurns() {//내 턴이 돌아올 때까지 턴을 계속함
     var timer = setInterval(function () {
         if (nowPlayer === 0 || winFlag) {
             clearInterval(timer);
+            return;
         }
         if (!(nowPlayer === 0 || winFlag)) {
             Turn();
         }
         if (nowPlayer === 0 || winFlag) {
             clearInterval(timer);
+            return;
         }
     }, 2000)
 }
@@ -521,4 +523,6 @@ function shareKakao() {
         },
       },
     })
-}
+
+  }
+
