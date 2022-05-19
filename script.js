@@ -339,7 +339,7 @@ let selectableDest = [];
 let previousPositions = [];
 
 updateInterface();
-
+declareOfWin();
 function Turn() {
     console.log("\nPlayer no." + nowPlayer + " takes the turn!");
     changePlayer(nowPlayer);//상태창 변경
@@ -485,7 +485,13 @@ btnPopClose.addEventListener('click', function () {
 
 function declareOfWin() {// 승리 시 선언되는 함수
     updateInterface();
-    document.getElementById(`dsc`).innerText = "Player "+nowPlayer + " Wins!!";
+    if (nowPlayer === 0){
+        document.getElementById('dsc').innerText = "You Win!!";
+    }
+
+    else{
+        document.getElementById(`dsc`).innerText = "Player "+nowPlayer + " Wins!!";
+    }
     document.querySelector('#popup').style.display = 'block';
 }
 
@@ -515,4 +521,4 @@ function shareKakao() {
         },
       },
     })
-  }
+}
